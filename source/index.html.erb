@@ -1,0 +1,90 @@
+<div id="utmgen">
+  <form class="form-horizontal">
+    <div class="form-item">
+      <label for="url" class="1/4">URL</label>
+      <input type="text" name="url" v-model="url" class="5/8">
+    </div>
+    <div class="form-item">
+      <label for="campaignName" class="1/4">Campaign name</label>
+      <input type="text" name="campaign" v-model="campaign"  class="5/8">
+    </div>
+  </form>
+
+  <table>
+    <colgroup>
+      <col class="1/4"></col>
+      <col class="1/4"></col>
+      <col class="1/2"></col>
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Target</th>
+        <th>Medium</th>
+        <th>Generated URL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr is="link-form" v-for="link in links" :url="url" :campaign="campaign"
+        :target="link.target" :medium="link.medium">
+      </tr>
+    </tbody>
+  </table>
+
+  <button v-on:click="add">Add</button>
+</div>
+
+<template id="link-form-template">
+  <tr>
+    <td><input type="text" v-model="target" class="1/1"></td>
+    <td><input type="text" v-model="medium" class="1/1"></td>
+    <td class=" grid-item grid">
+      <input type="text" class="utm-url grid-item 6/8" value="{{ utmUrl }}">
+      <div class="grid-item 1/8">
+        <button class="clip" data-clipboard-text="{{ utmUrl }}">copy</button>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<script type="text/javascript">
+  Vue.config.debug = true;
+
+  new Clipboard(".clip");
+
+  var LinkForm = Vue.extend({
+    template: "#link-form-template",
+    props: ["url", "campaign", "target", "medium"],
+
+    computed: {
+      utmUrl: function() {
+        var present = !(_.isEmpty(this.url) || _.isEmpty(this.target) ||
+          _.isEmpty(this.medium) || _.isEmpty(this.campaign))
+        if (present) {
+          return this.url + "?utm_source=" + this.target + "&utm_medium=" + this.medium +
+            "&utm_campaign=" + this.campaign;
+        }
+      }
+    }
+  });
+
+  window.utmgen = new Vue({
+    el: "#utmgen",
+    data: {
+      url: "http://blog.ragnarson.com",
+      campaign: "post-",
+      links: [
+        { target: "facebook", medium: "social" },
+        { target: "twitter", medium: "social" },
+        { target: "gplus", medium: "social" }
+      ]
+    },
+    components: {
+      "link-form": LinkForm
+    },
+    methods: {
+      add: function(event) {
+        this.links.push({});
+      }
+    }
+  })
+</script>
