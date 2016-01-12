@@ -34,11 +34,18 @@ end
 #   end
 # end
 
+activate :autoprefixer
+
 # Build-specific configuration
 configure :build do
-  # Minify CSS on build
-  # activate :minify_css
+  activate :minify_css
+  activate :minify_javascript
+  activate :asset_hash
+  set :http_prefix, "/utmgen"
+end
 
-  # Minify Javascript on build
-  # activate :minify_javascript
+activate :deploy do |deploy|
+  deploy.build_before = true
+  deploy.deploy_method = :git
+  deploy.strategy = :force_push
 end
